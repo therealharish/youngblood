@@ -244,8 +244,8 @@ app.get('/api/health', (_req, res) => {
 // ─── Start ────────────────────────────────────────────────────────────────────
 
 initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`⚡ YOUNGBLOOD server running on http://localhost:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`⚡ YOUNGBLOOD server running on http://0.0.0.0:${PORT}`);
   });
 }).catch((err) => {
   console.error('Failed to initialize database:', err);
