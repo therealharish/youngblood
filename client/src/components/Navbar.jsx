@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
-  { label: 'MISSION', href: '#hero' },
   { label: 'PILLARS', href: '#pillars' },
   { label: 'EVENTS', href: '#events' },
-  { label: 'JOIN', href: '#join' },
+  { label: 'CODE', href: '#code' },
 ];
 
 export default function Navbar() {
@@ -13,7 +12,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b-3 border-blood">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ padding: '1rem 5vw' }}>
         {/* Logo */}
         <a href="#hero" className="font-heading text-2xl font-bold tracking-tighter text-blood">
           YOUNGBLOOD

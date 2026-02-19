@@ -8,8 +8,8 @@ export default function Footer() {
             YOUNGBLOOD
           </h3>
           <p className="text-light-gray text-sm leading-relaxed max-w-xs">
-            A NYC-based social club making young adulthood less lonely through
-            community, play, and rebellious care.
+            A social club making adulthood less lonely through
+            community, culture, play, and rebellious care.
           </p>
         </div>
 
@@ -19,7 +19,7 @@ export default function Footer() {
             Navigate
           </h4>
           <div className="flex flex-col gap-2">
-            {['Mission', 'Pillars', 'Events', 'Join'].map((link) => (
+            {['Pillars', 'Events', 'Code', 'Join'].map((link) => (
               <a
                 key={link}
                 href={`#${link.toLowerCase()}`}

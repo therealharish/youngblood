@@ -52,7 +52,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-8 text-off-white/90 text-lg md:text-xl max-w-2xl leading-relaxed text-justify-mobile"  style={{ textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5)' }}
         >
-          Young adulthood is lonely as hell. We're building the antidote, a space where community, culture, music, and rebellious care collide.
+          Adulthood is lonely as hell. We're building the antidote. A space where community, culture, play, and rebellious care collide.
         </motion.p>
 
         {/* CTA Buttons */}
