@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
-  methods: ['GET', 'POST', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 app.use(express.json());
 
@@ -116,6 +116,42 @@ app.post('/api/admin/events', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Failed to create event' });
+  }
+});
+
+// PUT update event (admin only)
+app.put('/api/admin/events/:id', requireAdmin, async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { title, shortDescription, fullDescription, day, month, year, borough, playType, featured, images } = req.body;
+
+  if (!title || !shortDescription || !fullDescription || !day || !month || !borough || !playType) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE events SET title=$1, short_description=$2, full_description=$3, day=$4, month=$5, year=$6, borough=$7, play_type=$8, featured=$9
+       WHERE id=$10 RETURNING id`,
+      [title, shortDescription, fullDescription, day, month, year || '2025', borough, playType, !!featured, id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Event not found' });
+
+    // Replace images
+    await pool.query('DELETE FROM event_images WHERE event_id = $1', [id]);
+    if (images && images.length > 0) {
+      for (let i = 0; i < images.length; i++) {
+        await pool.query(
+          'INSERT INTO event_images (event_id, url, sort_order) VALUES ($1, $2, $3)',
+          [id, images[i], i]
+        );
+      }
+    }
+
+    const { rows } = await pool.query(EVENT_BY_ID_SQL, [id]);
+    res.json(formatEvent(rows[0]));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Failed to update event' });
   }
 });
 

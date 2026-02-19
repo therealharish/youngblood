@@ -102,6 +102,7 @@ function EventForm({ token }) {
   const [error, setError] = useState('');
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [editingId, setEditingId] = useState(null);
 
   const fetchEvents = () => {
     fetch(apiUrl('/api/events'))
@@ -133,29 +134,35 @@ function EventForm({ token }) {
       .map((u) => u.trim())
       .filter(Boolean);
 
+    const payload = {
+      title: form.title.toUpperCase(),
+      shortDescription: form.shortDescription,
+      fullDescription: form.fullDescription,
+      day: form.day,
+      month: form.month.toUpperCase(),
+      year: form.year,
+      borough: form.borough.toUpperCase(),
+      playType: form.playType.toUpperCase(),
+      featured: form.featured,
+      images,
+    };
+
     try {
-      const res = await fetch(apiUrl('/api/admin/events'), {
-        method: 'POST',
+      const url = editingId
+        ? apiUrl(`/api/admin/events/${editingId}`)
+        : apiUrl('/api/admin/events');
+      const res = await fetch(url, {
+        method: editingId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          title: form.title.toUpperCase(),
-          shortDescription: form.shortDescription,
-          fullDescription: form.fullDescription,
-          day: form.day,
-          month: form.month.toUpperCase(),
-          year: form.year,
-          borough: form.borough.toUpperCase(),
-          playType: form.playType.toUpperCase(),
-          featured: form.featured,
-          images,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create event');
-      setSuccess(`Event "${data.title}" created!`);
+      if (!res.ok) throw new Error(data.error || `Failed to ${editingId ? 'update' : 'create'} event`);
+      setSuccess(`Event "${data.title}" ${editingId ? 'updated' : 'created'}!`);
+      setEditingId(null);
       setForm({
         title: '',
         shortDescription: '',
@@ -173,6 +180,43 @@ function EventForm({ token }) {
       setError(err.message);
     }
     setSubmitting(false);
+  };
+
+  const handleEdit = (event) => {
+    setEditingId(event.id);
+    setForm({
+      title: event.title,
+      shortDescription: event.shortDescription,
+      fullDescription: event.fullDescription,
+      day: event.day,
+      month: event.month,
+      year: event.year,
+      borough: event.borough,
+      playType: event.playType,
+      featured: event.featured,
+      imageUrls: (event.images || []).join('\n'),
+    });
+    setSuccess('');
+    setError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm({
+      title: '',
+      shortDescription: '',
+      fullDescription: '',
+      day: '',
+      month: '',
+      year: '2025',
+      borough: 'BLR',
+      playType: '',
+      featured: false,
+      imageUrls: '',
+    });
+    setSuccess('');
+    setError('');
   };
 
   const handleDelete = async (id, title) => {
@@ -214,9 +258,19 @@ function EventForm({ token }) {
 
             {/* Form — 3 cols */}
             <div className="md:col-span-3">
-              <h2 className="font-heading text-xl font-bold uppercase tracking-tight mb-6">
-                Add New Event
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-heading text-xl font-bold uppercase tracking-tight">
+                  {editingId ? 'Edit Event' : 'Add New Event'}
+                </h2>
+                {editingId && (
+                  <button
+                    onClick={handleCancelEdit}
+                    className="text-light-gray font-heading text-xs tracking-wider hover:text-off-white cursor-pointer"
+                  >
+                    ✕ CANCEL EDIT
+                  </button>
+                )}
+              </div>
 
               <form onSubmit={handleSubmit}>
                 {/* Title */}
@@ -383,7 +437,7 @@ function EventForm({ token }) {
                   disabled={submitting}
                   className="w-full py-4 bg-blood text-off-white font-heading font-bold text-lg tracking-wider hover:bg-blood-light transition-colors duration-200 cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'CREATING...' : 'CREATE EVENT'}
+                  {submitting ? (editingId ? 'UPDATING...' : 'CREATING...') : (editingId ? 'UPDATE EVENT' : 'CREATE EVENT')}
                 </button>
               </form>
             </div>
@@ -413,12 +467,20 @@ function EventForm({ token }) {
                           {event.featured && <span className="text-blood-bright ml-2">★ FEATURED</span>}
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleDelete(event.id, event.title)}
-                        className="text-blood-bright font-heading text-xs tracking-wider hover:underline ml-4 flex-shrink-0 cursor-pointer"
-                      >
-                        DELETE
-                      </button>
+                      <div className="flex gap-3 ml-4 flex-shrink-0">
+                        <button
+                          onClick={() => handleEdit(event)}
+                          className="text-off-white font-heading text-xs tracking-wider hover:underline cursor-pointer"
+                        >
+                          EDIT
+                        </button>
+                        <button
+                          onClick={() => handleDelete(event.id, event.title)}
+                          className="text-blood-bright font-heading text-xs tracking-wider hover:underline cursor-pointer"
+                        >
+                          DELETE
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
