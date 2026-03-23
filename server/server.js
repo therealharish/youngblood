@@ -1,7 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { Resend } from 'resend';
 import { pool, initDB } from './db.js';
+import { welcomeEmail, adminNotificationEmail, blastEmail } from './emails.js';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const FROM_EMAIL = process.env.FROM_EMAIL || 'YOUNGBLOOD <onboarding@resend.dev>';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -217,6 +223,24 @@ app.post('/api/members', async (req, res) => {
       message: 'Welcome to YOUNGBLOOD',
       member: { id: result.rows[0].id, name, email, age: ageNum },
     });
+
+    // Send welcome email to new member (fire-and-forget)
+    resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: "You're in. Welcome to YOUNGBLOOD.",
+      html: welcomeEmail(name),
+    }).catch(err => console.error('Welcome email failed:', err));
+
+    // Notify admin (fire-and-forget)
+    if (ADMIN_EMAIL) {
+      resend.emails.send({
+        from: FROM_EMAIL,
+        to: ADMIN_EMAIL,
+        subject: `New YOUNGBLOOD member: ${name}`,
+        html: adminNotificationEmail(name, email, ageNum),
+      }).catch(err => console.error('Admin notification failed:', err));
+    }
   } catch (err) {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'You are already part of the rebellion' });
@@ -233,6 +257,44 @@ app.get('/api/members', async (_req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch members' });
+  }
+});
+
+// POST email blast to all members (admin only)
+app.post('/api/admin/email-blast', requireAdmin, async (req, res) => {
+  const { subject, message, htmlBody } = req.body;
+
+  if (!subject || (!message && !htmlBody)) {
+    return res.status(400).json({ error: 'Subject and content are required' });
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT email, name FROM members');
+    if (rows.length === 0) {
+      return res.status(400).json({ error: 'No members to email' });
+    }
+
+    const html = htmlBody ? blastEmail(htmlBody) : blastEmail(message.split('\n').map(p => `<p>${p}</p>`).join(''));
+
+    const emails = rows.map(r => r.email);
+
+    // Resend supports batch sending up to 100 at a time
+    const batchSize = 50;
+    let sent = 0;
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map(to =>
+          resend.emails.send({ from: FROM_EMAIL, to, subject, html })
+        )
+      );
+      sent += batch.length;
+    }
+
+    res.json({ message: `Email sent to ${sent} members` });
+  } catch (err) {
+    console.error('Email blast failed:', err);
+    res.status(500).json({ error: 'Failed to send emails' });
   }
 });
 

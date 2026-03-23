@@ -78,3 +78,37 @@ body {
   }
 }
 
+/* TipTap rich text editor styles */
+.tiptap {
+  outline: none;
+}
+.tiptap h1 { font-size: 2rem; font-weight: 700; margin: 0.5em 0; color: #f5f5f0; }
+.tiptap h2 { font-size: 1.5rem; font-weight: 700; margin: 0.5em 0; color: #f5f5f0; }
+.tiptap h3 { font-size: 1.25rem; font-weight: 600; margin: 0.5em 0; color: #f5f5f0; }
+.tiptap p { margin: 0.5em 0; }
+.tiptap ul { list-style: disc; padding-left: 1.5em; margin: 0.5em 0; }
+.tiptap ol { list-style: decimal; padding-left: 1.5em; margin: 0.5em 0; }
+.tiptap li { margin: 0.25em 0; }
+.tiptap a { color: #C62828; text-decoration: underline; }
+.tiptap blockquote {
+  border-left: 3px solid #C62828;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #8A8A8A;
+  font-style: italic;
+}
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 4px;
+}
+.tiptap hr {
+  border: none;
+  border-top: 2px solid #2A2A2A;
+  margin: 1.5em 0;
+}
+.tiptap strong { font-weight: 700; }
+.tiptap em { font-style: italic; }
+.tiptap u { text-decoration: underline; }
+

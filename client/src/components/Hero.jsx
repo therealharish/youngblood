@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative h-screen flex items-center justify-center overflow-hidden"
+      className="relative h-screen flex items-center justify-center overflow-hidden bg-black"
     >
       {/* ── Looping background video ── */}
       <video
@@ -20,6 +20,8 @@ export default function Hero() {
 
       {/* ── Dark overlay so text is always readable ── */}
       <div className="absolute inset-0 z-[5] bg-black/70" />
+      {/* ── Bottom fade to black for seamless transition ── */}
+      <div className="absolute bottom-0 left-0 right-0 z-[6]" style={{ height: '150px', background: 'linear-gradient(to bottom, transparent, black)' }} />
 
       {/* ── Center logo lockup ── */}
       <div className="relative z-10 flex flex-col items-center" style={{ paddingLeft: '8vw', paddingRight: '8vw', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%)', paddingTop: '4rem', paddingBottom: '4rem' }}>
@@ -39,10 +41,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-6 md:mt-8 font-heading text-base md:text-lg lg:text-xl tracking-[0.25em] text-off-white uppercase select-none"
-          style={{ textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5)' }}
+          className="font-heading text-xs md:text-lg lg:text-xl tracking-[0.15em] md:tracking-[0.25em] text-off-white uppercase select-none text-center"
+          style={{ marginTop: '0.5rem', textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5)' }}
         >
-          for the love of culture
+          the antidote to modern loneliness
         </motion.p>
 
         {/* Sub-copy */}
@@ -50,9 +52,11 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-8 text-off-white/90 text-lg md:text-xl max-w-2xl leading-relaxed text-justify-mobile"  style={{ textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5)' }}
+          className="text-off-white/90 text-base md:text-xl max-w-2xl leading-relaxed text-center"  style={{ marginTop: '1.5rem', textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5)' }}
         >
-          Adulthood is lonely as hell. We're building the antidote. A space where community, culture, play, and rebellious care collide.
+          Adulthood is lonely as hell. We're building the antidote.
+          <br className="hidden md:block" />{' '}
+          A space where community, culture, play, and rebellious care collide.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -64,29 +68,21 @@ export default function Hero() {
         >
           <a
             href="#join"
-            className="px-10 py-4 bg-blood text-off-white font-heading font-bold text-lg tracking-wider hover:bg-blood-light transition-colors duration-200"
+            className="px-10 py-4 bg-blood text-off-white font-heading font-bold text-sm tracking-wider hover:bg-blood-light transition-colors duration-200 border-3 border-blood text-center"
+            style={{ minWidth: '220px' }}
           >
             JOIN THE REBELLION →
           </a>
           <a
             href="#events"
-            className="px-10 py-4 bg-transparent text-off-white font-heading font-bold text-lg tracking-wider border-3 border-off-white/20 hover:bg-blood hover:border-blood transition-colors duration-200"
+            className="px-10 py-4 bg-transparent text-off-white font-heading font-bold text-sm tracking-wider border-3 border-off-white/20 hover:bg-blood hover:border-blood transition-colors duration-200 text-center"
+            style={{ minWidth: '220px' }}
           >
             SEE EVENTS
           </a>
         </motion.div>
       </div>
 
-      {/* ── Scroll hint at bottom ── */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-      >
-        <div className="w-6 h-10 border-2 border-off-white/50 rounded-full flex justify-center pt-2">
-          <div className="w-1 h-2 bg-off-white/70 rounded-full" />
-        </div>
-      </motion.div>
     </section>
   );
 }
